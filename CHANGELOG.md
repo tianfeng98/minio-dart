@@ -1,3 +1,7 @@
+# 3.5.8+1
+
+- Add a retry controller to enhance the reliability of network requests.
+
 # 3.5.8
 
 - Fix path encoding for space and plus characters in object names to prevent signature mismatch errors #7
