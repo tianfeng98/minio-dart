@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:minio/src/utils.dart';
 import 'package:test/test.dart';
+import 'package:tf_minio/src/utils.dart';
 
 void main() {
   testRfc7231Time();

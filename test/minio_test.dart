@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:minio/io.dart';
-import 'package:minio/minio.dart';
-import 'package:minio/src/minio_models_generated.dart';
-import 'package:minio/src/utils.dart';
 import 'package:test/test.dart';
+import 'package:tf_minio/io.dart';
+import 'package:tf_minio/minio.dart';
+import 'package:tf_minio/src/minio_models_generated.dart';
+import 'package:tf_minio/src/utils.dart';
 
 import 'helpers.dart';
 
@@ -220,7 +220,8 @@ void testFPutObject() {
       };
 
       final minio = getMinioClient();
-      await minio.fPutObject(bucketName, objectName, testFile.path, metadata: metadata);
+      await minio.fPutObject(bucketName, objectName, testFile.path,
+          metadata: metadata);
 
       final stat = await minio.statObject(bucketName, objectName);
       expect(
@@ -237,7 +238,8 @@ void testFPutObject() {
       };
 
       final minio = getMinioClient();
-      await minio.fPutObject(bucketName, objectName, testFile.path, metadata: metadata);
+      await minio.fPutObject(bucketName, objectName, testFile.path,
+          metadata: metadata);
 
       final stat = await minio.statObject(bucketName, objectName);
       expect(

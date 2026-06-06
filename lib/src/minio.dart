@@ -4,16 +4,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:minio/src/minio_client.dart';
-import 'package:minio/src/minio_errors.dart';
-import 'package:minio/src/minio_helpers.dart';
-import 'package:minio/src/minio_models.dart';
-import 'package:minio/src/minio_models_generated.dart';
-import 'package:minio/src/minio_poller.dart';
-import 'package:minio/src/minio_sign.dart';
-import 'package:minio/src/minio_stream.dart';
-import 'package:minio/src/minio_uploader.dart';
-import 'package:minio/src/utils.dart';
+import 'package:tf_minio/src/minio_client.dart';
+import 'package:tf_minio/src/minio_errors.dart';
+import 'package:tf_minio/src/minio_helpers.dart';
+import 'package:tf_minio/src/minio_models.dart';
+import 'package:tf_minio/src/minio_models_generated.dart';
+import 'package:tf_minio/src/minio_poller.dart';
+import 'package:tf_minio/src/minio_sign.dart';
+import 'package:tf_minio/src/minio_stream.dart';
+import 'package:tf_minio/src/minio_uploader.dart';
+import 'package:tf_minio/src/utils.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:xml/xml.dart' show XmlElement;
 

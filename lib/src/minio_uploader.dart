@@ -6,11 +6,12 @@ import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
-import 'package:minio/minio.dart';
-import 'package:minio/models.dart';
-import 'package:minio/src/minio_client.dart';
-import 'package:minio/src/minio_helpers.dart';
-import 'package:minio/src/utils.dart';
+import 'package:tf_minio/minio.dart';
+import 'package:tf_minio/models.dart';
+import 'package:tf_minio/src/minio_client.dart';
+import 'package:tf_minio/src/minio_helpers.dart';
+import 'package:tf_minio/src/retry_controller.dart';
+import 'package:tf_minio/src/utils.dart';
 
 class MinioUploader implements StreamConsumer<Uint8List> {
   MinioUploader(
@@ -118,17 +119,28 @@ class MinioUploader implements StreamConsumer<Uint8List> {
     Map<String, String> headers,
     Map<String, String?>? queries,
   ) async {
-    final resp = await client.request(
-      method: 'PUT',
-      headers: headers,
-      queries: queries,
-      bucket: bucket,
-      object: object,
-      payload: chunk,
-      onProgress: _updateProgress,
-    );
+    final resp = await AsyncOperation.retry(
+      operation: () async {
+        final response = await client.request(
+          method: 'PUT',
+          headers: headers,
+          queries: queries,
+          bucket: bucket,
+          object: object,
+          payload: chunk,
+          onProgress: _updateProgress,
+        );
 
-    validate(resp);
+        validate(response);
+        return response;
+      },
+      retryController: RetryController.forNetworkErrors(
+        maxRetries: RetryController.defaultMaxRetries,
+        onRetry: (attemptCount, maxRetries, error) => print(
+          'Retrying upload of part $_partNumber (attempt $attemptCount/$maxRetries) due to error: $error',
+        ),
+      ),
+    );
 
     var etag = resp.headers['etag'];
     if (etag != null) etag = trimDoubleQuote(etag);

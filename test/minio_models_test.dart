@@ -1,5 +1,5 @@
-import 'package:minio/models.dart';
 import 'package:test/test.dart';
+import 'package:tf_minio/models.dart';
 
 void main() {
   final date = DateTime.utc(2017, 8, 11, 19, 34, 18);

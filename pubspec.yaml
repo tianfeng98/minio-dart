@@ -1,8 +1,8 @@
-name: minio
+name: tf_minio
 description: Unofficial MinIO Dart Client SDK that provides simple APIs to access any Amazon S3 compatible object storage server.
-version: 3.5.8
-homepage: https://github.com/xtyxtyx/minio-dart
-issue_tracker: https://github.com/xtyxtyx/minio-dart/issues
+version: 3.5.8+1
+homepage: https://github.com/tf98/minio-dart
+issue_tracker: https://github.com/tf98/minio-dart/issues
 
 environment:
   sdk: ">=3.0.0 <4.0.0"

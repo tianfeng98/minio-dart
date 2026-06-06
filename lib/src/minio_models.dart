@@ -1,8 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:minio/src/minio_errors.dart';
-import 'package:minio/src/minio_models_generated.dart';
-import 'package:minio/src/utils.dart';
+import 'package:tf_minio/src/minio_errors.dart';
+import 'package:tf_minio/src/minio_models_generated.dart';
+import 'package:tf_minio/src/utils.dart';
 import 'package:xml/xml.dart';
 
 class ListObjectsResult {

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:minio/minio.dart';
+import 'package:tf_minio/minio.dart';
 
 /// Initializes an instance of [Minio] with per default valid configuration.
 ///

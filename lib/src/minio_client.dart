@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:http/http.dart';
-import 'package:minio/minio.dart';
-import 'package:minio/src/minio_helpers.dart';
-import 'package:minio/src/minio_s3.dart';
-import 'package:minio/src/minio_sign.dart';
-import 'package:minio/src/utils.dart';
+import 'package:tf_minio/minio.dart';
+import 'package:tf_minio/src/minio_helpers.dart';
+import 'package:tf_minio/src/minio_s3.dart';
+import 'package:tf_minio/src/minio_sign.dart';
+import 'package:tf_minio/src/utils.dart';
 
 class MinioRequest extends StreamedRequest {
   MinioRequest(super.method, super.url, {this.onProgress});

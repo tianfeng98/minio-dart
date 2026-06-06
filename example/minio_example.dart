@@ -1,5 +1,5 @@
-import 'package:minio/io.dart';
-import 'package:minio/minio.dart';
+import 'package:tf_minio/io.dart';
+import 'package:tf_minio/minio.dart';
 
 void main() async {
   final minio = Minio(

@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:minio/src/minio.dart';
-import 'package:minio/src/minio_errors.dart';
-import 'package:minio/src/minio_helpers.dart';
 import 'package:path/path.dart' show dirname;
+import 'package:tf_minio/src/minio.dart';
+import 'package:tf_minio/src/minio_errors.dart';
+import 'package:tf_minio/src/minio_helpers.dart';
 
 extension MinioX on Minio {
   // Uploads the object using contents from a file

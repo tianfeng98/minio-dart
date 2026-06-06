@@ -1,5 +1,5 @@
-import 'package:minio/src/minio_helpers.dart';
 import 'package:test/test.dart';
+import 'package:tf_minio/src/minio_helpers.dart';
 
 void main() {
   group('helpers', () {
