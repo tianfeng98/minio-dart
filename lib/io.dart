@@ -5,6 +5,7 @@ import 'package:path/path.dart' show dirname;
 import 'package:tf_minio/src/minio.dart';
 import 'package:tf_minio/src/minio_errors.dart';
 import 'package:tf_minio/src/minio_helpers.dart';
+import 'package:tf_minio/src/retry_controller.dart';
 
 extension MinioX on Minio {
   // Uploads the object using contents from a file
@@ -14,6 +15,13 @@ extension MinioX on Minio {
     String filePath, {
     Map<String, String>? metadata,
     void Function(int)? onProgress,
+    int? maxRetries,
+    void Function(
+      UploadRetryStage stage,
+      int attemptCount,
+      int maxRetries,
+      dynamic error,
+    )? onRetry,
   }) async {
     MinioInvalidBucketNameError.check(bucket);
     MinioInvalidObjectNameError.check(object);
@@ -37,6 +45,8 @@ extension MinioX on Minio {
       size: stat.size,
       metadata: metadata,
       onProgress: onProgress,
+      maxRetries: maxRetries,
+      onRetry: onRetry,
     );
   }
 

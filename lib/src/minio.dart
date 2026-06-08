@@ -13,6 +13,7 @@ import 'package:tf_minio/src/minio_poller.dart';
 import 'package:tf_minio/src/minio_sign.dart';
 import 'package:tf_minio/src/minio_stream.dart';
 import 'package:tf_minio/src/minio_uploader.dart';
+import 'package:tf_minio/src/retry_controller.dart';
 import 'package:tf_minio/src/utils.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:xml/xml.dart' show XmlElement;
@@ -931,6 +932,13 @@ class Minio {
     int? chunkSize,
     Map<String, String>? metadata,
     void Function(int)? onProgress,
+    int? maxRetries,
+    void Function(
+      UploadRetryStage stage,
+      int attemptCount,
+      int maxRetries,
+      dynamic error,
+    )? onRetry,
   }) async {
     MinioInvalidBucketNameError.check(bucket);
     MinioInvalidObjectNameError.check(object);
@@ -955,6 +963,8 @@ class Minio {
       partSize,
       metadata,
       onProgress,
+      maxRetries,
+      onRetry,
     );
     final chunker = MinChunkSize(partSize);
     final etag = await data.transform(chunker).pipe(uploader);

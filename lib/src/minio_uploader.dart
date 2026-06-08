@@ -22,6 +22,8 @@ class MinioUploader implements StreamConsumer<Uint8List> {
     this.partSize,
     this.metadata,
     this.onProgress,
+    this.maxRetries,
+    this.onRetry,
   );
 
   final Minio minio;
@@ -31,6 +33,13 @@ class MinioUploader implements StreamConsumer<Uint8List> {
   final int partSize;
   final Map<String, String> metadata;
   final void Function(int)? onProgress;
+  final int? maxRetries;
+  final void Function(
+    UploadRetryStage stage,
+    int attemptCount,
+    int maxRetries,
+    dynamic error,
+  )? onRetry;
 
   var _partNumber = 1;
 
@@ -59,7 +68,7 @@ class MinioUploader implements StreamConsumer<Uint8List> {
       }
 
       if (_partNumber == 1 && chunk.length < partSize) {
-        _etag = await _uploadChunk(chunk, headers, null);
+        _etag = await _uploadChunk(chunk, headers, null, 1);
         return;
       }
 
@@ -86,7 +95,7 @@ class MinioUploader implements StreamConsumer<Uint8List> {
         'uploadId': _uploadId,
       };
 
-      final etag = await _uploadChunk(chunk, headers, queries);
+      final etag = await _uploadChunk(chunk, headers, queries, partNumber);
       final part = CompletedPart(etag, partNumber);
       _parts[part] = chunk.length;
     }
@@ -95,11 +104,16 @@ class MinioUploader implements StreamConsumer<Uint8List> {
   @override
   Future<String?> close() async {
     if (_uploadId == null) return _etag;
-    return minio.completeMultipartUpload(
-      bucket,
-      object,
-      _uploadId!,
-      _parts.keys.toList(),
+    return AsyncOperation.retry(
+      operation: () => minio.completeMultipartUpload(
+        bucket,
+        object,
+        _uploadId!,
+        _parts.keys.toList(),
+      ),
+      retryController: _buildNetworkRetryController(
+        stage: UploadRetryStage.completeMultipartUpload,
+      ),
     );
   }
 
@@ -118,6 +132,7 @@ class MinioUploader implements StreamConsumer<Uint8List> {
     Uint8List chunk,
     Map<String, String> headers,
     Map<String, String?>? queries,
+    int? partNumber,
   ) async {
     final resp = await AsyncOperation.retry(
       operation: () async {
@@ -134,11 +149,9 @@ class MinioUploader implements StreamConsumer<Uint8List> {
         validate(response);
         return response;
       },
-      retryController: RetryController.forNetworkErrors(
-        maxRetries: RetryController.defaultMaxRetries,
-        onRetry: (attemptCount, maxRetries, error) => print(
-          'Retrying upload of part $_partNumber (attempt $attemptCount/$maxRetries) due to error: $error',
-        ),
+      retryController: _buildNetworkRetryController(
+        stage: UploadRetryStage.uploadChunk,
+        partNumber: partNumber,
       ),
     );
 
@@ -155,16 +168,44 @@ class MinioUploader implements StreamConsumer<Uint8List> {
     // uploadId = await minio.findUploadId(bucket, object);
 
     if (_uploadId == null) {
-      _uploadId =
-          await minio.initiateNewMultipartUpload(bucket, object, metadata);
+      _uploadId = await AsyncOperation.retry(
+        operation: () =>
+            minio.initiateNewMultipartUpload(bucket, object, metadata),
+        retryController: _buildNetworkRetryController(
+          stage: UploadRetryStage.initiateMultipartUpload,
+        ),
+      );
       return;
     }
 
     final parts = minio.listParts(bucket, object, _uploadId!);
-    final entries = await parts
-        .asyncMap((part) => MapEntry(part.partNumber, part))
-        .toList();
+    final entries = await AsyncOperation.retry(
+      operation: () =>
+          parts.asyncMap((part) => MapEntry(part.partNumber, part)).toList(),
+      retryController: _buildNetworkRetryController(
+        stage: UploadRetryStage.listParts,
+      ),
+    );
     _oldParts = Map.fromEntries(entries);
+  }
+
+  RetryController _buildNetworkRetryController({
+    required UploadRetryStage stage,
+    int? partNumber,
+  }) {
+    return RetryController.forNetworkErrors(
+      maxRetries: maxRetries ?? RetryController.defaultMaxRetries,
+      onRetry: (attemptCount, retries, error) {
+        onRetry?.call(stage, attemptCount, retries, error);
+
+        final target = partNumber == null
+            ? stage.wireValue
+            : '${stage.wireValue}(part=$partNumber)';
+        print(
+          'Retrying $target (attempt $attemptCount/$retries) due to error: $error',
+        );
+      },
+    );
   }
 
   void _updateProgress(int bytesUploaded) {

@@ -1,3 +1,7 @@
+# 3.5.8+3
+
+- Enhanced retry controller: Add an upload retry stage and related logic, and update the upload function to support the retry mechanism
+
 # 3.5.8+2
 
 - Enhanced Retry Controller: Extend Socket Error Checking to Include Handshake and TLS/SSL Errors

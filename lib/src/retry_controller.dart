@@ -17,6 +17,30 @@ enum RetryStrategy {
   immediate,
 }
 
+/// 上传重试阶段
+enum UploadRetryStage {
+  uploadChunk,
+  initiateMultipartUpload,
+  listParts,
+  completeMultipartUpload,
+}
+
+/// 上传重试阶段字符串映射
+extension UploadRetryStageWireValue on UploadRetryStage {
+  String get wireValue {
+    switch (this) {
+      case UploadRetryStage.uploadChunk:
+        return 'uploadChunk';
+      case UploadRetryStage.initiateMultipartUpload:
+        return 'initiateMultipartUpload';
+      case UploadRetryStage.listParts:
+        return 'listParts';
+      case UploadRetryStage.completeMultipartUpload:
+        return 'completeMultipartUpload';
+    }
+  }
+}
+
 /// 重试条件类型
 typedef RetryCondition = bool Function(
   Object error,
