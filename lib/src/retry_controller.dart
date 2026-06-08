@@ -266,10 +266,15 @@ class RetryController {
 
   /// 检查是否是Socket错误
   static bool _isSocketError(Object error) {
+    final errorString = error.toString().toLowerCase();
     return error is SocketException ||
-        error.toString().toLowerCase().contains('socket') ||
-        error.toString().toLowerCase().contains('connection reset') ||
-        error.toString().toLowerCase().contains('broken pipe');
+        error is HandshakeException ||
+        errorString.contains('socket') ||
+        errorString.contains('connection reset') ||
+        errorString.contains('broken pipe') ||
+        errorString.contains('handshake') ||
+        errorString.contains('tls') ||
+        errorString.contains('ssl');
   }
 
   /// 检查是否是超时错误
