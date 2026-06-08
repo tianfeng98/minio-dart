@@ -1,3 +1,7 @@
+# 3.5.8+2
+
+- Enhanced Retry Controller: Extend Socket Error Checking to Include Handshake and TLS/SSL Errors
+
 # 3.5.8+1
 
 - Add a retry controller to enhance the reliability of network requests.
